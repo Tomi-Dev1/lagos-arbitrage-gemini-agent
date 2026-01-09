@@ -1,0 +1,7 @@
+{
+  "name": "Eko Market Arbitrage Dashboard",
+  "description": "A high-performance dashboard for tracking market price disparities across Lagos markets, featuring real-time data from Supabase and distance-aware logistics calculations.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
