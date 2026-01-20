@@ -1,41 +1,20 @@
-Lagos Arbitrage Agent 🚀
-A Gemini 3-powered Logistics Intelligence Tool for Nigerian Markets
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-🧠 The Gemini Integration
-This project leverages Gemini 3 Pro’s Reasoning (Thinking) capabilities to solve the "last-mile profit" problem. Unlike standard price-comparison tools, this agent acts as a trade consultant that:
+# Run and deploy your AI Studio app
 
-Processes Long-Context Data: Analyzes a specialized dataset of 1,200+ market entries.
+This contains everything you need to run your app locally.
 
-Location-Aware Reasoning: Uses the user's live GPS coordinates to calculate haulage costs (₦500/km) from 5 major Lagos hubs (Alaba, Mile 12, Computer Village, etc.).
+View your app in AI Studio: https://ai.studio/apps/drive/13t3clQCUa2jV7zBGnBVmNT0IABnpZI31
 
-Decision Logic: Determines "True Net Profit" by subtracting logistics fees and weighing the risk of distance against potential gain.
+## Run Locally
 
-🛠️ Technical Stack
-Model: Gemini 3 Pro / Flash (Google AI Studio)
+**Prerequisites:**  Node.js
 
-Dataset: 1,200+ rows of curated Lagos market vs. Online price data.
 
-Frontend: React / Tailwind CSS (Deployed via Cloud Run/AI Studio).
-
-APIs: Browser Geolocation API for real-time logistics tracking.
-
-🚀 Key Features
-Smart Search: Instant filtering of 1.2k assets with zero-lag UI.
-
-Logistics Engine: Dynamic delivery fee calculation based on proximity to Mile 12, Alaba, or Ikeja.
-
-Market Insights: Macro-analysis of market volatility and average profit margins in the "Stats" dashboard.
-
-🚦 How to Test
-Open the [Live Project Link]
-
-Allow Location Access when prompted (Required for the Logistics Agent to function).
-
-Search for items like "Samsung" or "HP" to see the reasoning engine in action.
-
-🛡️ Future Roadmap
-Gemini Live Integration: Voice-to-JSON inventory updates for market merchants.
-
-Multimodal Scrapers: Vision-based price tracking from Jumia/Konga.
-
-Predictive Trends: Long-context analysis of FX impact on local electronics prices.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
