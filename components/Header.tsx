@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ userLocation, activeTab, onTabChange, a
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
             <span className="flex h-1.5 w-1.5 rounded-full bg-lagosYellow animate-pulse"></span>
             <span className="text-[10px] font-black text-zinc-400 uppercase tracking-tight">
-              {(assetsCount / 1000).toFixed(1)}k Assets Live
+              {(assetsCount / 1000).toFixed(1)}k+ Assets Live
             </span>
           </div>
 

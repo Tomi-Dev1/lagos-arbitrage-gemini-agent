@@ -43,10 +43,11 @@ const DealCard: React.FC<DealCardProps> = ({ deal, userLocation, logisticsMode }
   const logisticsData = useMemo(() => {
     if (!userLocation) return null;
     const marketStr = (deal?.market_a || deal?.market_name || '').toLowerCase();
-    const marketName = Object.keys(MARKET_COORDINATES).find(k => 
-      marketStr.includes(k.toLowerCase())
-    ) || 'Ikeja';
-    const marketCoords = MARKET_COORDINATES[marketName];
+    const marketKey = Object.keys(MARKET_COORDINATES).find(k => 
+        marketStr.includes(k.toLowerCase())
+    ) as keyof typeof MARKET_COORDINATES || 'Ikeja';
+    
+    const marketCoords = MARKET_COORDINATES[marketKey];
     const distance = getDistance(userLocation.lat, userLocation.lng, marketCoords.lat, marketCoords.lng);
     
     // Base logic: 500 NGN base + 250 NGN per km
@@ -60,7 +61,7 @@ const DealCard: React.FC<DealCardProps> = ({ deal, userLocation, logisticsMode }
     return {
       distance: distance.toFixed(1),
       cost: estimatedCost,
-      market: marketName
+      market: marketKey
     };
   }, [userLocation, deal, logisticsMode]);
 
