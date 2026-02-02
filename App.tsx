@@ -7,76 +7,7 @@ import Header from './components/Header';
 
 const App: React.FC = () => {
   // Mock Data Definition
-  const MOCK_DEALS: MarketDeal[] = [
-    {
-      id: 'mock-1',
-      created_at: new Date().toISOString(),
-      item_name: 'Indomie Belle Full (Box of 40)',
-      market_name: 'Oke-Arin Market',
-      price_a: 8500, // Mile 12 / Original Price
-      price_b: 11200, // Online / Resale Price
-      market_a: 'Oke-Arin',
-      market_b: 'Jumia Food',
-      profit_percentage: 24.1,
-      potential_profit: 2700,
-      thought_signature: 'AGENT_MOCK_GEN_01',
-      specialized_category: 'FMCG & Food',
-      online_price: 11200, // For consistency
-      mile12_price: 8500, // For consistency
-      product_name: 'Indomie Belle Full'
-    },
-    {
-      id: 'mock-2',
-      created_at: new Date().toISOString(),
-      item_name: 'Royal Stallion Rice (50kg)',
-      market_name: 'Daleko Market',
-      price_a: 78000, 
-      price_b: 95000, 
-      market_a: 'Daleko',
-      market_b: 'Konga Glo',
-      profit_percentage: 17.9,
-      potential_profit: 17000,
-      thought_signature: 'AGENT_MOCK_GEN_02',
-      specialized_category: 'Foodstuffs',
-      online_price: 95000,
-      mile12_price: 78000,
-      product_name: 'Royal Stallion Rice'
-    },
-    {
-      id: 'mock-3',
-      created_at: new Date().toISOString(),
-      item_name: 'Yam Tubers (Large - 100pcs)',
-      market_name: 'Mile 12',
-      price_a: 120000, 
-      price_b: 185000, 
-      market_a: 'Mile 12',
-      market_b: 'Lekki Retail',
-      profit_percentage: 35.1,
-      potential_profit: 65000,
-      thought_signature: 'AGENT_MOCK_GEN_03',
-      specialized_category: 'Farm Produce',
-      online_price: 185000,
-      mile12_price: 120000,
-      product_name: 'Yam Tubers'
-    },
-    {
-        id: 'mock-4',
-        created_at: new Date().toISOString(),
-        item_name: 'MacBook Pro M3 Max',
-        market_name: 'Computer Village',
-        price_a: 4500000,
-        price_b: 5200000,
-        market_a: 'Computer Village',
-        market_b: 'TechPoints VI',
-        profit_percentage: 13.5,
-        potential_profit: 700000,
-        thought_signature: 'AGENT_MOCK_GEN_04',
-        specialized_category: 'Electronics',
-        online_price: 5200000,
-        mile12_price: 4500000,
-        product_name: 'MacBook Pro M3'
-    }
-  ];
+  // Mock Data Removed
 
   const [deals, setDeals] = useState<MarketDeal[]>([]);
   const [status, setStatus] = useState<MarketStatus>(MarketStatus.LOADING);
@@ -89,28 +20,17 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortByProfit, setSortByProfit] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // For forcing refreshes via useEffect
   const itemsPerPage = 10;
 
-  const getAugmentedDeals = (fetchedDeals: MarketDeal[] | null) => {
-    // Randomize Mock Data Prices to simulate "Live" updates
-    const randomizedMockDeals = MOCK_DEALS.map(deal => {
-        const volatility = 1 + (Math.random() * 0.1 - 0.05); // +/- 5% change
-        const newPriceA = Math.floor((deal.price_a || 0) * volatility);
-        const newPriceB = Math.floor((deal.price_b || 0) * volatility);
-        
-        return {
-            ...deal,
-            id: `${deal.id}-${Date.now()}`, // Ensure unique ID on refresh
-            created_at: new Date().toISOString(),
-            price_a: newPriceA,
-            price_b: newPriceB,
-            online_price: newPriceB,
-            mile12_price: newPriceA
-        };
-    });
-
-    const baseDeals = fetchedDeals || [];
-    return [...randomizedMockDeals, ...baseDeals];
+  // Fisher-Yates Shuffle Algorithm to randomize deals client-side
+  const shuffleArray = (array: MarketDeal[]) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   };
 
   const fetchDeals = async () => {
@@ -120,22 +40,23 @@ const App: React.FC = () => {
         .from('market_deals')
         .select('*')
         .limit(2000)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .neq('item_name', `_bust_${new Date().getTime()}`); // Cache Buster
 
       if (supabaseError) throw supabaseError;
 
-      const augmentedData = getAugmentedDeals(data);
-      setDeals(augmentedData);
+      // Shuffle the data so every refresh looks "new"
+      const shuffledData = shuffleArray(data || []);
+      setDeals(shuffledData);
       setStatus(MarketStatus.SUCCESS);
     } catch (err: any) {
       console.error('Error fetching market deals:', err);
-      // Fallback to mock data if DB fails
-      setDeals(getAugmentedDeals([])); 
-      // Keep error state but show data
+      // Clean error state handling
+      setDeals([]); 
+      setStatus(MarketStatus.SUCCESS); // Stop loading even on error
+
       if (err.message !== 'Failed to fetch') {
          setError(err.message);
-      } else {
-         setStatus(MarketStatus.SUCCESS); 
       }
     }
   };
@@ -162,14 +83,17 @@ const App: React.FC = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'market_deals' },
-        () => fetchDeals()
+        () => {
+           // When external change happens, trigger a refresh
+           setRefreshTrigger(prev => prev + 1);
+        }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [refreshTrigger]); // Depend on refreshTrigger
 
   // Bulletproof Live Filtering Logic
   const filteredAndSortedDeals = useMemo(() => {
@@ -273,7 +197,7 @@ const App: React.FC = () => {
 
                   <div className="flex items-center gap-3">
                     <button 
-                      onClick={fetchDeals}
+                      onClick={() => setRefreshTrigger(prev => prev + 1)}
                       className="flex items-center justify-center gap-2 bg-zinc-800 text-white font-bold py-2.5 px-5 rounded-xl transition-all active:scale-95 hover:bg-zinc-700 border border-zinc-700"
                       title="Refresh Data"
                     >
