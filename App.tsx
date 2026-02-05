@@ -4,9 +4,9 @@ import { supabase } from './supabaseClient';
 import { MarketDeal, MarketStatus, AppTab, LogisticsMode } from './types';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
+import ChatComponent from './components/ChatComponent';
 
 const App: React.FC = () => {
-  // Mock Data Definition
   // Mock Data Removed
 
   const [deals, setDeals] = useState<MarketDeal[]>([]);
@@ -67,10 +67,18 @@ const App: React.FC = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
+          const { latitude, longitude } = position.coords;
+          // Rough bounding box for Nigeria: Lat 4-14, Lng 2.5-15
+          // If outside, default to Mile 12
+          if (latitude < 4 || latitude > 14 || longitude < 2.5 || longitude > 15) {
+             console.log("User outside Nigeria. Defaulting to Mile 12.");
+             setUserLocation({ lat: 6.5933, lng: 3.3359 });
+          } else {
+             setUserLocation({
+               lat: latitude,
+               lng: longitude
+             });
+          }
         },
         () => {
           setUserLocation({ lat: 6.5933, lng: 3.3359 });
@@ -136,6 +144,13 @@ const App: React.FC = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredAndSortedDeals.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredAndSortedDeals, currentPage]);
+  
+  // Calculate top profitable deals for AI Context
+  const topDealsForAI = useMemo(() => {
+    return [...deals]
+      .sort((a, b) => (b.potential_profit || 0) - (a.potential_profit || 0))
+      .slice(0, 15);
+  }, [deals]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -347,6 +362,9 @@ const App: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* AI Chat Bot */}
+      <ChatComponent topDeals={topDealsForAI} allDeals={deals} />
 
       <footer className="border-t border-zinc-900 py-10 mt-12 bg-ekoBlack">
         <div className="container mx-auto px-4 text-center">

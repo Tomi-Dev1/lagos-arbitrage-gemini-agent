@@ -66,6 +66,25 @@ const DealCard: React.FC<DealCardProps> = ({ deal, userLocation, logisticsMode }
   }, [userLocation, deal, logisticsMode]);
 
   const calculatedProfit = (deal.online_price || deal.price_b || 0) - (deal.mile12_price || deal.price_a || 0);
+  
+  const handleWhatsAppShare = () => {
+    const itemName = deal.product_name || deal.item_name || 'Unknown Item';
+    const buyPrice = deal.mile12_price || deal.price_a || 0;
+    const sellPrice = deal.online_price || deal.price_b || 0;
+    const marketName = deal.market_a || deal.market_name || 'Local Market';
+    
+    // Construct the message
+    const message = `Eko Arbitrage Deal Alert
+Item: ${itemName}
+Buy: ₦${buyPrice.toLocaleString()} at ${marketName}
+Sell: ₦${sellPrice.toLocaleString()}
+Estimated Profit: ₦${calculatedProfit.toLocaleString()}
+Shared via Eko Arbitrage Market Agent`;
+
+    // Encode and open WhatsApp
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
 
   return (
     <div className="group relative bg-ekoGray border border-zinc-800 rounded-3xl overflow-hidden transition-all duration-300 hover:border-lagosYellow/50 card-shadow flex flex-col h-full">
@@ -165,6 +184,16 @@ const DealCard: React.FC<DealCardProps> = ({ deal, userLocation, logisticsMode }
            <span>{new Date(deal.created_at).toLocaleString()}</span>
            <span>AGENT_REF_{String(deal.id).slice(0, 5)}</span>
         </div>
+
+        {/* WhatsApp Share Button */}
+        <button 
+          onClick={handleWhatsAppShare}
+          className="mt-4 w-full py-3 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors duration-300 shadow-lg active:scale-95"
+          title="Share on WhatsApp"
+        >
+          <i className="fab fa-whatsapp text-xl"></i>
+          <span>Share Deal</span>
+        </button>
       </div>
     </div>
   );
