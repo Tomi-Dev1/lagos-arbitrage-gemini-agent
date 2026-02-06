@@ -54,7 +54,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ topDeals, allDeals }) => 
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
         }, { apiVersion: 'v1beta' });
 
         // Convert data to readable text string as requested
@@ -82,25 +82,38 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ topDeals, allDeals }) => 
         
         const csvData = generateCSV(allDeals);
 
-        let systemPrompt = '';
+        const baseSystemPrompt = `
+        You are a **Market Arbitrage Agent**.
+        
+        **PRIMARY RULE**: If the user mentions a PRODUCT (e.g., rice, beans), ANSWER IMMEDIATELY with the Top 3 deals. NO other logic (like missing location) may block this.
+        
+        **INTERNAL LOGIC (STRICTLY IN ENGLISH)**:
+        1. **Location**: Treat as OPTIONAL CONTEXT. Never ask for confirmation.
+        2. **Greeting Suppression**: Do NOT say "How far", "Welcome", "How are you". Go straight to data.
+        3. **Scope**: Calculate and return ONLY the **Top 3** most profitable deals. Stop reasoning after 3.
+        4. **Loop Prevention**: Never ask the same question twice. If info is missing, use best-effort guess.
+        5. **Failsafe**: If in doubt, output the deals.
+        `;
 
+        let outputInstruction = '';
         if (language === 'english') {
-            systemPrompt = `
-            You are a **Friendly Market Guide**. 
-            - **Tone**: Simple, conversational, easy to understand. Avoid corporate or academic language.
-            - **Goal**: Help the user find profitable deals quickly.
-            - **Constraint**: Return ONLY the **Top 3** most profitable deals by default. Keep it short.
-            - **Data**: You have access to a CSV file stored in Supabase that contains market deal data.
-            `;
+             outputInstruction = `
+             **OUTPUT STYLE**:
+             - Language: Simple, direct English.
+             - Format: Short lines. No paragraphs.
+             - Tone: Friendly but efficient.
+             `;
         } else {
-            systemPrompt = `
-            You are a **Naija Market Paddy**.
-            - **Tone**: Natural Nigerian Pidgin (e.g., "How far?", "See better deal", "No long tin").
-            - **Goal**: Give sharp updates on where money dey.
-            - **Constraint**: Show ONLY the **Top 3** better deals. No long story.
-            - **Data**: You have access to a CSV file stored in Supabase that contains market deal data.
-            `;
+             outputInstruction = `
+             **OUTPUT STYLE**:
+             - Language: **Nigerian Pidgin**.
+             - Instruction: Reason in English, but TRANSLATE the final output to natural, street-smart Pidgin.
+             - Format: Short lines. Practical tone. No long story.
+             - Example: "See the best 3 deals for Rice:"
+             `;
         }
+
+        const systemPrompt = `${baseSystemPrompt}\n${outputInstruction}`;
 
         const prompt = `
         ${systemPrompt}
@@ -130,9 +143,13 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ topDeals, allDeals }) => 
            - If a queried product exists in \`item_name\`, NEVER respond with "no data available". Explain the deal found.
         5. **Response Format**:
            - **Default**: Show ONLY the Top 3 best deals. 
-           - **Concise**: Keep answers short. No long reports.
+           - **Concise**: Keep answers short (max 2-3 sentences per deal). No report-style formatting.
            - **Scope**: Do NOT analyze the full dataset unless explicitly asked (e.g., "Analyze everything").
            - **Next Step**: Ask the user if they want to see more deals or details.
+        6. **Interaction Rules**:
+           - **No Loops**: Never repeat the same clarification question.
+           - **Forward Progress**: Always move towards answering the market query, even if some details are missing.
+           - **Override**: If the user mentions a product, ignore all other rules and output the deals for that product.
         
         **User Query:** "${userMessage}"
         `;
@@ -286,7 +303,7 @@ Shared via Eko Arbitrage Market Agent`;
                 </button>
 
                 <div className="text-center">
-                     <p className="text-[9px] text-zinc-600 font-mono">POWERED BY GEMINI 2.5</p>
+                     <p className="text-[9px] text-zinc-600 font-mono">POWERED BY GEMINI 3 PREVIEW</p>
                 </div>
             </div>
           </div>
