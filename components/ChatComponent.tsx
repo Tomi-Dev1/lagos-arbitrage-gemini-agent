@@ -99,17 +99,31 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ topDeals, allDeals }) => 
         if (language === 'english') {
              outputInstruction = `
              **OUTPUT STYLE**:
-             - Language: Simple, direct English.
-             - Format: Short lines. No paragraphs.
+             - Format: STRICTLY PLAIN TEXT. NO Markdown. NO bold.
+             - Spacing: MUST use a double newline (blank line) between every deal.
+             - Structure:
+               [Item Name] ([Quantity])
+               Buy: [Price] at [Market]
+               Sell: [Price]
+               Profit: [Amount]
+               
+               (Next deal here...)
              - Tone: Friendly but efficient.
              `;
         } else {
              outputInstruction = `
              **OUTPUT STYLE**:
              - Language: **Nigerian Pidgin**.
-             - Instruction: Reason in English, but TRANSLATE the final output to natural, street-smart Pidgin.
-             - Format: Short lines. Practical tone. No long story.
-             - Example: "See the best 3 deals for Rice:"
+             - Instruction: Reason in English, but TRANSLATE to detailed Pidgin.
+             - Format: STRICTLY PLAIN TEXT. NO Markdown.
+             - Spacing: MUST put blank line between every deal. NO PACKING.
+             - Structure:
+               [Item Name] ([Quantity])
+               Buy: [Price] for [Market]
+               Sell: [Price]
+               Gain: [Amount]
+               
+               (Next deal here...)
              `;
         }
 

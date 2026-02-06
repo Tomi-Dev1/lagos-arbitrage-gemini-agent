@@ -172,17 +172,9 @@ Shared via Eko Arbitrage Market Agent`;
           </div>
         </div>
 
-        <div className="pt-4 border-t border-zinc-800/50">
-          <div className="bg-black/20 rounded-lg p-3">
-            <p className="text-[10px] font-mono text-zinc-600 leading-relaxed break-words">
-              SIG: {deal.thought_signature || 'AGENT_AUTONOMOUS_GEN'}
-            </p>
-          </div>
-        </div>
         
         <div className="mt-4 flex justify-between items-center text-[8px] font-bold text-zinc-800 uppercase tracking-tighter">
            <span>{new Date(deal.created_at).toLocaleString()}</span>
-           <span>AGENT_REF_{String(deal.id).slice(0, 5)}</span>
         </div>
 
         {/* WhatsApp Share Button */}

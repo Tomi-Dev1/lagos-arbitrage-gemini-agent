@@ -181,6 +181,7 @@ const App: React.FC = () => {
                     LIVE <span className="text-lagosYellow">DEALS</span>
                   </h2>
                   <p className="text-zinc-500 text-sm mt-1">Real-time arbitrage opportunities filtered by our autonomous agent.</p>
+                  <p className="text-zinc-500 text-xs mt-0.5 opacity-80">Ask me which market deals give the best profit across Lagos.</p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
