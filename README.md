@@ -1,17 +1,47 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img
+    width="1200"
+    height="475"
+    alt="Eko Arbitrage Market Agent Banner"
+    src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6"
+  />
 </div>
 
-# Run and deploy your AI Studio app
+# Eko Arbitrage Market Agent
 
-This contains everything you need to run your app locally.
+Eko Arbitrage Market Agent is a **Gemini 3–powered market intelligence web app** that helps users identify profitable arbitrage opportunities across Lagos markets and online stores.
 
-View your app in AI Studio: https://ai.studio/apps/drive/13t3clQCUa2jV7zBGnBVmNT0IABnpZI31
+The app analyzes real market price data, reasons over price differences, and presents clear, actionable deal recommendations. It supports both **English and Nigerian Pidgin**, and allows users to share verified deals instantly via WhatsApp.
+
+This project was built for the **Gemini 3 Hackathon**.
+
+---
+
+## Live Demo
+
+**Live Web App**  
+https://lagos-arbitrage-agent.vercel.app/
+
+---
+
+## Features
+
+- Gemini 3–powered reasoning over 1,200+ Lagos market price entries  
+- Top arbitrage deals ranked by profit  
+- Optional browser geolocation to estimate distance and pickup effort  
+- English and Nigerian Pidgin language support  
+- One-tap WhatsApp sharing for real-world trading workflows  
+
+---
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+### Prerequisites
 
+- Node.js (v18 or later recommended)
+- A Gemini API key
+
+### Setup
 
 1. Install dependencies:
    `npm install`
